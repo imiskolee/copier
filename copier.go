@@ -43,7 +43,7 @@ func Copy(toValue interface{}, fromValue interface{}) (err error) {
 			amount = from.Len()
 		}
 	}
-
+	
 	for i := 0; i < amount; i++ {
 		var dest, source reflect.Value
 
@@ -171,7 +171,9 @@ func set(to, from reflect.Value) bool {
 		if from.Type().ConvertibleTo(to.Type()) {
 			to.Set(from.Convert(to.Type()))
 		} else if scanner, ok := to.Addr().Interface().(sql.Scanner); ok {
-			scanner.Scan(from.Interface())
+			if !from.IsNil() {
+				scanner.Scan(from.Interface())
+			}
 		} else if from.Kind() == reflect.Ptr {
 			return set(to, from.Elem())
 		} else {
